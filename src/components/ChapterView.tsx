@@ -13,14 +13,14 @@ const ChapterView: React.FC = () => {
     : '# 章节未找到\n\n抱歉，您请求的章节目前不存在。';
 
   return (
-    <div className="flex flex-col md:flex-row h-full w-full overflow-hidden">
+    <div className="flex flex-col md:flex-row h-full w-full overflow-hidden bg-gray-900">
       {/* Left Panel: Knowledge Base */}
-      <div className="w-full md:w-1/2 h-1/2 md:h-full border-b md:border-b-0 md:border-r border-gray-700">
+      <div className="w-full md:w-1/2 h-1/2 md:h-full border-b md:border-b-0 md:border-r border-gray-700 flex flex-col">
         <KnowledgeBase content={content} />
       </div>
 
       {/* Right Panel: Visualizer */}
-      <div className="w-full md:w-1/2 h-1/2 md:h-full">
+      <div className="w-full md:w-1/2 h-1/2 md:h-full flex flex-col overflow-hidden">
         <Visualizer />
       </div>
     </div>

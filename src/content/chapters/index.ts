@@ -1,5 +1,5 @@
 export const chaptersContent: Record<string, string> = {
-  fourier: `# 傅里叶变换核心知识库
+  'fourier': `# 傅里叶变换核心知识库
 
 欢迎来到频域的世界。这里我们将通过交互式可视化，带你深刻理解《信号与系统》中最重要的核心概念。
 
@@ -11,7 +11,7 @@ export const chaptersContent: Record<string, string> = {
 其指数形式的傅里叶级数公式为：
 $$x(t) = \\sum_{n=-\\infty}^{\\infty} X_n e^{jn\\omega_0 t}$$
 
-当我们尝试用有限次谐波去合成一个理想的方波时，随着保留的谐波次数 $N$ 的增加，合成波形会越来越接近真实的方波。但是，在方波的突变处，无论 $N$ 多大，总会存在一个约占总跳变幅度 **9% 的过冲（Overshoot）**。这就是著名的**吉布斯现象（Gibbs Phenomenon）**。
+当我们尝试用有限次谐波去合成一个理想的方波时，随着保留的谐波次数 $N$ 的增加，合成波形会越来越接近真实的方波。但是，在方波的突变处，无论 $N$ 大小，总会存在一个约占总跳变幅度 **9% 的过冲（Overshoot）**。这就是著名的**吉布斯现象（Gibbs Phenomenon）**。
 
 <button class="not-prose interactive-btn bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mt-2 mb-4 transition-colors cursor-pointer" data-module="1" data-params='{"N": 3}'>▶ 演示：N=3 时的粗糙合成</button>
 <br>
@@ -48,7 +48,7 @@ $$x(at) \\leftrightarrow \\frac{1}{|a|} X\\left(j\\frac{\\omega}{a}\\right)$$
 
 线性时不变系统对信号的作用，在频域看来本质上就是**滤波**。理想低通滤波器允许低频成分无失真地通过，同时完全截断高于截止频率 $W_c$ 的高频成分。
 
-高频成分通常代表了信号在时域中的“细节”和“突变边缘”。因此，经过低通滤波后，原本拥有锐利边缘的方波会失去细节，变得圆滑（同时可能伴随振铃现象）。
+高频成分通常代表了信号格时域中的“细节”和“突变边缘”。因此，经过低通滤波后，原本拥有锐利边缘的方波会失去细节，变得圆滑（同时可能伴随振铃现象）。
 
 <button class="not-prose interactive-btn bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mt-2 mb-4 transition-colors cursor-pointer" data-module="4" data-params='{"Wc": 15}'>▶ 演示：宽通带 Wc=15 (保留边缘)</button>
 <br>
@@ -84,6 +84,24 @@ $$y(t) = x(t) * h(t) = \\int_{-\\infty}^{\\infty} x(\\tau)h(t-\\tau) d\\tau$$
 <button class="not-prose interactive-btn bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mt-2 mb-4 transition-colors cursor-pointer" data-module="timeDomain" data-params='{"signalType": "rect", "systemType": "rect", "t": -2, "autoPlay": true}'>▶ 演示：两个矩形脉冲的卷积</button>
 <br>
 <button class="not-prose interactive-btn bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="timeDomain" data-params='{"signalType": "rect", "systemType": "exp", "t": -2, "autoPlay": true}'>▶ 演示：矩形脉冲与指数衰减</button>
+`,
+  'vector-space': `# 信号与系统的矢量空间分析
+
+信号处理不仅可以看作是时域的波形计算，还可以从**线性代数**的几何视角来审视。我们将信号 $x(t)$ 看作是无限维希尔伯特空间中的一个“矢量”。
+
+### 信号的正交投影
+就像在三维空间中将一个矢量投影到坐标轴上一样，我们可以将复杂信号投影到一组**正交基函数**（如正弦波组）上。
+傅里叶级数的系数 $c_k$ 实际上就是原信号在第 $k$ 个正交基上的“投影长度”。
+
+### Parseval 定理：能量守恒
+Parseval 定理是矢量空间分析中最优美的结论之一：**信号的总能量等于其在所有正交基分量上的能量之和。**
+$$\\int_{-\\infty}^{\\infty} x^2(t) dt = \\sum_{k=-\\infty}^{\\infty} |c_k|^2$$
+
+右侧可视化展示了方波投影到前 $N$ 个正交基的过程，并实时计算能量守恒百分比。
+
+<button class="not-prose interactive-btn bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mt-2 mb-4 transition-colors cursor-pointer" data-module="vectorSpace" data-params='{"projectionAxes": 3}'>▶ 演示：3 轴投影 (初步逼近)</button>
+<br>
+<button class="not-prose interactive-btn bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="vectorSpace" data-params='{"projectionAxes": 10}'>▶ 演示：10 轴投影 (高度逼近)</button>
 `,
   's-domain': `# s 域分析：系统稳定性与拉普拉斯变换
 
@@ -146,5 +164,56 @@ $$\\begin{bmatrix} x'_1 \\\\ x'_2 \\end{bmatrix} = A \\begin{bmatrix} x_1 \\\\ x
 <button class="not-prose interactive-btn bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="stateSpace" data-params='{"dynamicsType": "saddle"}'>▶ 演示：鞍点 (双曲线发散)</button>
 <br>
 <button class="not-prose interactive-btn bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="stateSpace" data-params='{"dynamicsType": "unstable_node"}'>▶ 演示：不稳定节点 (猛烈爆炸)</button>
+`,
+  'feedback': `# 反馈系统与根轨迹分析
+
+反馈是控制理论的灵魂。通过将输出信号引回输入端，我们可以改变系统的极点分布，从而让原本不稳定的系统变稳定，或让迟钝的系统变敏捷。
+
+### 开环与闭环
+假设开环传递函数为 $G(s)$，在负反馈增益 $K$ 的作用下，闭环传递函数变为：
+$$T(s) = \\frac{K G(s)}{1 + K G(s)}$$
+
+### 根轨迹 (Root Locus)
+根轨迹是指当反馈增益 $K$ 从 $0 \\to \\infty$ 变化时，闭环极点在 s 平面上的移动轨迹。
+通过观察根轨迹，我们可以：
+- **判定稳定性：** 轨迹是否会进入右半平面？
+- **优化性能：** 寻找能产生理想阻尼比的 $K$ 值。
+
+右侧演示了一个双极点系统 $(s+2)(s+4)$ 的根轨迹演化。
+
+<button class="not-prose interactive-btn bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mt-2 mb-4 transition-colors cursor-pointer" data-module="feedback" data-params='{"feedbackGain": 0.5}'>▶ 演示：小增益 (过阻尼)</button>
+<br>
+<button class="not-prose interactive-btn bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="feedback" data-params='{"feedbackGain": 1.0}'>▶ 演示：临界点 (K=1.0)</button>
+<br>
+<button class="not-prose interactive-btn bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="feedback" data-params='{"feedbackGain": 10.0}'>▶ 演示：大增益 (欠阻尼振荡)</button>
+`,
+  'filter-design': `# 系统逼近与滤波器设计
+
+理想的“砖墙式”低通滤波器在物理上是因果不可实现的。工程上我们必须用有限阶数的系统去逼近它。
+
+### 核心权衡：平坦度 vs 陡峭度
+- **巴特沃斯 (Butterworth):** 极点分布在半圆上，主打通带“最大平坦”，牺牲了滚降速度。
+- **切比雪夫 (Chebyshev):** 极点分布在椭圆上，允许通带内存在“涟波 (Ripple)”，换取了极陡峭的过渡带截断效果。
+
+右侧可视化展示了极点排布与幅频响应的实时联动。您可以来回切换这两种滤波器，直观感受工程权衡的魅力。
+
+<button class="not-prose interactive-btn bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mt-2 mb-4 transition-colors cursor-pointer" data-module="filterDesign" data-params='{"filterType": "butterworth", "filterOrder": 3}'>▶ 演示：巴特沃斯 (最大平坦)</button>
+<br>
+<button class="not-prose interactive-btn bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="filterDesign" data-params='{"filterType": "chebyshev", "filterOrder": 4}'>▶ 演示：切比雪夫 (陡峭滚降)</button>
+`,
+  'random-signals': `# 随机信号通过线性系统
+
+现实世界充满了不可预测的噪声。理解随机信号通过线性系统后的统计特性演变，是通信与射频工程的基础。
+
+### 白噪声与有色噪声
+- **白噪声 (White Noise):** 功率谱密度（PSD）在全频段均匀分布，信号极度杂乱。
+- **有色噪声 (Colored Noise):** 当白噪声通过一个具有特定带宽的低通滤波器时，高频分量被削弱，信号变得圆滑。
+
+### 实时演示
+右侧的实时射频示波器展示了这一“驯服”噪声的过程。下方的功率谱密度图直观地反映了系统对噪声能量分布的整形作用。
+
+<button class="not-prose interactive-btn bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded mt-2 mb-4 transition-colors cursor-pointer" data-module="randomSignals" data-params='{"noiseIntensity": 8, "systemBandwidth": 20}'>▶ 演示：全带宽白噪声</button>
+<br>
+<button class="not-prose interactive-btn bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="randomSignals" data-params='{"noiseIntensity": 6, "systemBandwidth": 2}'>▶ 演示：窄带平滑处理</button>
 `,
 };

@@ -13,12 +13,103 @@ const Visualizer: React.FC = () => {
   
   // Controls logic
   const renderControls = () => {
-    // Safety check for params
     if (!params) return null;
+
+    if (chapterId === 'random-signals' && params.randomSignals) {
+      return (
+        <div className="flex flex-wrap items-center justify-center gap-6 p-4 w-full max-w-5xl mx-auto">
+          <div className="flex items-center space-x-4">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Noise Intensity:</label>
+            <input 
+              type="range" min="1" max="10" step="0.5" 
+              value={params.randomSignals.noiseIntensity}
+              onChange={(e) => updateParam('randomSignals', 'noiseIntensity', parseFloat(e.target.value))}
+              className="w-32 cursor-pointer accent-gray-400"
+            />
+            <span className="text-sm font-mono text-gray-300 w-8">{params.randomSignals.noiseIntensity}</span>
+          </div>
+
+          <div className="flex-grow flex items-center space-x-4 border-l border-gray-700 pl-4">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">System Bandwidth (wc):</label>
+            <input 
+              type="range" min="1" max="20" step="0.5" 
+              value={params.randomSignals.systemBandwidth}
+              onChange={(e) => updateParam('randomSignals', 'systemBandwidth', parseFloat(e.target.value))}
+              className="flex-grow cursor-pointer accent-green-500"
+            />
+            <span className="text-sm font-mono text-green-400 w-8 text-right">{params.randomSignals.systemBandwidth}</span>
+          </div>
+
+          <div className="text-xs text-gray-500 italic border-l border-gray-700 pl-4">
+            White noise filtered by a linear LPF becomes colored noise.
+          </div>
+        </div>
+      );
+    }
+
+    if (chapterId === 'filter-design' && params.filterDesign) {
+      return (
+        <div className="flex flex-wrap items-center justify-center gap-6 p-4 w-full max-w-5xl mx-auto">
+          <div className="flex items-center space-x-3">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Filter Type:</label>
+            <div className="flex bg-gray-700 p-1 rounded-md">
+              {(['butterworth', 'chebyshev'] as const).map((type) => (
+                <button
+                  key={type}
+                  onClick={() => updateParam('filterDesign', 'filterType', type)}
+                  className={`px-3 py-1 text-xs rounded transition-all ${
+                    params.filterDesign.filterType === type 
+                      ? 'bg-green-600 text-white shadow-lg' 
+                      : 'text-gray-400 hover:text-gray-200'
+                  }`}
+                >
+                  {type.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex-grow flex items-center space-x-4 border-l border-gray-700 pl-4">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Order N:</label>
+            <input 
+              type="range" min="1" max="8" step="1" 
+              value={params.filterDesign.filterOrder}
+              onChange={(e) => updateParam('filterDesign', 'filterOrder', parseInt(e.target.value))}
+              className="flex-grow cursor-pointer accent-blue-500"
+            />
+            <span className="text-sm font-mono text-blue-400 w-8 text-right">{params.filterDesign.filterOrder}</span>
+          </div>
+
+          <div className="text-xs text-gray-500 italic border-l border-gray-700 pl-4">
+            {params.filterDesign.filterType === 'chebyshev' ? 'Chebyshev: Sharper roll-off with passband ripples.' : 'Butterworth: Maximally flat passband.'}
+          </div>
+        </div>
+      );
+    }
+
+    if (chapterId === 'feedback' && params.feedback) {
+      return (
+        <div className="flex flex-wrap items-center justify-center gap-6 p-4 w-full max-w-5xl mx-auto">
+          <div className="flex-grow flex items-center space-x-4">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Feedback Gain K:</label>
+            <input 
+              type="range" min="0" max="20" step="0.1" 
+              value={params.feedback.feedbackGain}
+              onChange={(e) => updateParam('feedback', 'feedbackGain', parseFloat(e.target.value))}
+              className="flex-grow cursor-pointer accent-red-500"
+            />
+            <span className="text-sm font-mono text-red-400 w-12 text-right">{params.feedback.feedbackGain.toFixed(1)}</span>
+          </div>
+          <div className="text-xs text-gray-500 italic border-l border-gray-700 pl-4">
+            Increase K to push poles together and then apart into oscillations.
+          </div>
+        </div>
+      );
+    }
 
     if (chapterId === 'state-space' && params.stateSpace) {
       return (
-        <div className="flex flex-wrap items-center gap-6 p-4 bg-gray-800 rounded-lg w-full max-w-5xl">
+        <div className="flex flex-wrap items-center justify-center gap-6 p-4 w-full max-w-5xl mx-auto">
           <div className="flex items-center space-x-3">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">System Dynamics (Matrix A):</label>
             <div className="flex bg-gray-700 p-1 rounded-md">
@@ -46,8 +137,7 @@ const Visualizer: React.FC = () => {
 
     if (chapterId === 'z-domain' && params.zDomain) {
       return (
-        <div className="flex flex-wrap items-center gap-6 p-4 bg-gray-800 rounded-lg w-full max-w-5xl">
-          {/* Radius Control */}
+        <div className="flex flex-wrap items-center justify-center gap-6 p-4 w-full max-w-5xl mx-auto">
           <div className="flex-grow flex items-center space-x-4">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Radius r (Stability):</label>
             <input 
@@ -60,8 +150,6 @@ const Visualizer: React.FC = () => {
               {params.zDomain.poleRadius.toFixed(2)}
             </span>
           </div>
-
-          {/* Angle Control */}
           <div className="flex-grow flex items-center space-x-4">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Angle \u03B8 (Freq):</label>
             <input 
@@ -72,7 +160,6 @@ const Visualizer: React.FC = () => {
             />
             <span className="text-sm font-mono text-purple-400 w-12 text-right">{params.zDomain.poleAngle.toFixed(2)}</span>
           </div>
-
           <div className="text-xs text-gray-500 italic border-l border-gray-700 pl-4">
             Radius &gt; 1 = Unstable!
           </div>
@@ -82,8 +169,7 @@ const Visualizer: React.FC = () => {
 
     if (chapterId === 's-domain' && params.sDomain) {
       return (
-        <div className="flex flex-wrap items-center gap-6 p-4 bg-gray-800 rounded-lg w-full max-w-5xl">
-          {/* Sigma Control */}
+        <div className="flex flex-wrap items-center justify-center gap-6 p-4 w-full max-w-5xl mx-auto">
           <div className="flex-grow flex items-center space-x-4">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Real \u03C3 (Damping):</label>
             <input 
@@ -96,8 +182,6 @@ const Visualizer: React.FC = () => {
               {params.sDomain.sigma.toFixed(2)}
             </span>
           </div>
-
-          {/* Omega Control */}
           <div className="flex-grow flex items-center space-x-4">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Imag j\u03C9 (Freq):</label>
             <input 
@@ -108,7 +192,6 @@ const Visualizer: React.FC = () => {
             />
             <span className="text-sm font-mono text-purple-400 w-12 text-right">{params.sDomain.omega.toFixed(1)}</span>
           </div>
-
           <div className="text-xs text-gray-500 italic border-l border-gray-700 pl-4">
             Try moving \u03C3 &gt; 0 to see instability!
           </div>
@@ -116,10 +199,29 @@ const Visualizer: React.FC = () => {
       );
     }
 
+    if (chapterId === 'vector-space' && params.vectorSpace) {
+      return (
+        <div className="flex flex-wrap items-center justify-center gap-6 p-4 w-full max-w-5xl mx-auto">
+          <div className="flex-grow flex items-center space-x-4">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Projection Axes:</label>
+            <input 
+              type="range" min="1" max="15" step="1" 
+              value={params.vectorSpace.projectionAxes}
+              onChange={(e) => updateParam('vectorSpace', 'projectionAxes', parseInt(e.target.value))}
+              className="flex-grow cursor-pointer accent-blue-500"
+            />
+            <span className="text-sm font-mono text-blue-400 w-12 text-right">{params.vectorSpace.projectionAxes}</span>
+          </div>
+          <div className="text-xs text-gray-500 italic border-l border-gray-700 pl-4">
+            Observe Parseval's energy conservation.
+          </div>
+        </div>
+      );
+    }
+
     if (chapterId === 'time-domain' && params.timeDomain) {
       return (
-        <div className="flex flex-wrap items-center gap-6 p-4 bg-gray-800 rounded-lg w-full max-w-5xl">
-          {/* Signal x(t) Select */}
+        <div className="flex flex-wrap items-center justify-center gap-6 p-4 w-full max-w-5xl mx-auto">
           <div className="flex items-center space-x-2">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Signal x(\u03C4):</label>
             <select 
@@ -133,8 +235,6 @@ const Visualizer: React.FC = () => {
               <option value="sine">Sine Pulse</option>
             </select>
           </div>
-
-          {/* System h(t) Select */}
           <div className="flex items-center space-x-2">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">System h(\u03C4):</label>
             <select 
@@ -147,26 +247,22 @@ const Visualizer: React.FC = () => {
               <option value="step">Unit Step</option>
             </select>
           </div>
-
-          {/* Timeline Slider */}
           <div className="flex-grow flex items-center space-x-4">
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Time t:</label>
             <input 
               type="range" min="-5" max="10" step="0.1" 
               value={params.timeDomain.t}
               disabled={params.timeDomain.autoPlay}
-              onChange={(e) => updateParam('timeDomain' as any, 't', parseFloat(e.target.value))}
+              onChange={(e) => updateParam('timeDomain', 't', parseFloat(e.target.value))}
               className={`flex-grow cursor-pointer ${params.timeDomain.autoPlay ? 'opacity-30' : ''}`}
             />
             <span className="text-sm font-mono text-white w-10 text-right">{params.timeDomain.t.toFixed(1)}</span>
           </div>
-
-          {/* AutoPlay Checkbox */}
           <label className="flex items-center space-x-2 cursor-pointer">
             <input 
               type="checkbox" 
               checked={params.timeDomain.autoPlay}
-              onChange={(e) => updateParam('timeDomain' as any, 'autoPlay', e.target.checked ? 1 : 0)}
+              onChange={(e) => updateParam('timeDomain', 'autoPlay', e.target.checked)}
               className="form-checkbox h-4 w-4 text-blue-600 rounded bg-gray-700 border-gray-600"
             />
             <span className="text-sm font-medium text-gray-300">Auto Play</span>
@@ -175,17 +271,16 @@ const Visualizer: React.FC = () => {
       );
     }
 
-    if (chapterId !== 'fourier') return <div className="text-gray-500 italic">本章节暂无参数调节</div>;
+    if (chapterId !== 'fourier') return <div className="text-gray-500 italic text-center w-full">本章节暂无参数调节</div>;
 
     const modKey = (typeof activeModule === 'number' && activeModule <= 5 ? `mod${activeModule}` : activeModule) as keyof typeof params;
     const modParams = params[modKey] as any;
-
     if (!modParams) return null;
 
     switch (activeModule) {
       case 1:
         return (
-          <div className="flex items-center space-x-4 p-4 bg-gray-800 rounded-lg w-full max-w-2xl">
+          <div className="flex items-center justify-center space-x-4 p-4 w-full max-w-2xl mx-auto">
             <label className="text-sm font-semibold text-gray-200 shrink-0">谐波次数 N:</label>
             <input 
               type="range" min="1" max="50" step="2" value={modParams.N}
@@ -197,7 +292,7 @@ const Visualizer: React.FC = () => {
         );
       case 2:
         return (
-          <div className="flex items-center space-x-4 p-4 bg-gray-800 rounded-lg w-full max-w-2xl">
+          <div className="flex items-center justify-center space-x-4 p-4 w-full max-w-2xl mx-auto">
             <label className="text-sm font-semibold text-gray-200 shrink-0">周期 T:</label>
             <input 
               type="range" min="2" max="20" step="0.5" value={modParams.T}
@@ -209,7 +304,7 @@ const Visualizer: React.FC = () => {
         );
       case 3:
         return (
-          <div className="flex items-center space-x-4 p-4 bg-gray-800 rounded-lg w-full max-w-2xl">
+          <div className="flex items-center justify-center space-x-4 p-4 w-full max-w-2xl mx-auto">
             <label className="text-sm font-semibold text-gray-200 shrink-0">脉冲宽度尺度 a:</label>
             <input 
               type="range" min="0.2" max="5" step="0.1" value={modParams.a}
@@ -221,7 +316,7 @@ const Visualizer: React.FC = () => {
         );
       case 4:
         return (
-          <div className="flex items-center space-x-4 p-4 bg-gray-800 rounded-lg w-full max-w-2xl">
+          <div className="flex items-center justify-center space-x-4 p-4 w-full max-w-2xl mx-auto">
             <label className="text-sm font-semibold text-gray-200 shrink-0">截止频率 Wc:</label>
             <input 
               type="range" min="1" max="20" step="1" value={modParams.Wc}
@@ -233,7 +328,7 @@ const Visualizer: React.FC = () => {
         );
       case 5:
         return (
-          <div className="flex items-center space-x-4 p-4 bg-gray-800 rounded-lg w-full max-w-2xl">
+          <div className="flex items-center justify-center space-x-4 p-4 w-full max-w-2xl mx-auto">
             <label className="text-sm font-semibold text-gray-200 shrink-0">抽样频率 fs:</label>
             <input 
               type="range" min="0.5" max="5.0" step="0.1" value={modParams.fs}
@@ -256,13 +351,10 @@ const Visualizer: React.FC = () => {
 
     let animationFrameId: number;
     const strategy = getStrategy(chapterId);
-    console.log('Visualizer chapterId:', chapterId, 'Found strategy:', !!strategy);
 
     const render = (time: number) => {
       const { width, height } = canvas;
       const t = time / 1000;
-      
-      // Clear background
       ctx.fillStyle = '#1a1a2e';
       ctx.fillRect(0, 0, width, height);
 
@@ -278,7 +370,6 @@ const Visualizer: React.FC = () => {
         ctx.textAlign = 'center';
         ctx.fillText("可视化引擎正在构建中...", width / 2, height / 2);
       }
-
       animationFrameId = requestAnimationFrame(render);
     };
 
@@ -301,12 +392,12 @@ const Visualizer: React.FC = () => {
   }, [chapterId, activeModule, params]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-gray-900 overflow-hidden relative">
-      <div className="absolute top-2 right-2 text-[10px] text-gray-700 pointer-events-none">v1.2-fix</div>
-      <div className="h-20 border-b border-gray-700 p-2 flex justify-center items-center shrink-0">
+    <div className="flex flex-col h-full w-full bg-gray-900 overflow-hidden relative border-l border-gray-800">
+      {/* Dynamic Height Control Bar to prevent clipping */}
+      <div className="min-h-[5rem] h-auto border-b border-gray-700 p-2 flex justify-center items-center shrink-0 relative z-20 overflow-visible">
         {renderControls()}
       </div>
-      <div className="flex-grow relative">
+      <div className="flex-grow relative overflow-hidden z-10">
         <canvas ref={canvasRef} className="absolute inset-0 block w-full h-full" />
       </div>
     </div>

@@ -34,6 +34,21 @@ export const useAppStore = create<AppState>((set) => ({
     },
     stateSpace: {
       dynamicsType: 'stable_focus'
+    },
+    feedback: {
+      feedbackGain: 1.0,
+      systemType: 'two-pole'
+    },
+    filterDesign: {
+      filterType: 'butterworth',
+      filterOrder: 3
+    },
+    vectorSpace: {
+      projectionAxes: 3
+    },
+    randomSignals: {
+      noiseIntensity: 5,
+      systemBandwidth: 10
     }
   },
   setActiveModule: (id) => set({ activeModule: id }),

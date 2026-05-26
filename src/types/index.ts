@@ -1,7 +1,17 @@
-export type ModuleId = 1 | 2 | 3 | 4 | 5 | 'timeDomain' | 'sDomain' | 'zDomain' | 'stateSpace';
+export type ModuleId = 
+  | 1 | 2 | 3 | 4 | 5 
+  | 'timeDomain' 
+  | 'sDomain' 
+  | 'zDomain' 
+  | 'stateSpace' 
+  | 'feedback' 
+  | 'filterDesign' 
+  | 'vectorSpace'
+  | 'randomSignals';
 
 export type SignalType = 'rect' | 'step' | 'sine' | 'tri';
 export type SystemType = 'exp' | 'rect' | 'step';
+export type FilterType = 'butterworth' | 'chebyshev';
 
 export interface ModuleParams {
   mod1: { N: number };
@@ -25,6 +35,21 @@ export interface ModuleParams {
   };
   stateSpace: {
     dynamicsType: 'stable_focus' | 'center' | 'saddle' | 'unstable_node';
+  };
+  feedback: {
+    feedbackGain: number;
+    systemType: 'two-pole';
+  };
+  filterDesign: {
+    filterType: FilterType;
+    filterOrder: number;
+  };
+  vectorSpace: {
+    projectionAxes: number;
+  };
+  randomSignals: {
+    noiseIntensity: number;
+    systemBandwidth: number;
   };
 }
 

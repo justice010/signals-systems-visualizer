@@ -15,20 +15,22 @@ const chapters = [
 
 const Navigation: React.FC = () => {
   return (
-    <nav className="h-14 w-full bg-gray-800 border-b border-gray-700 flex items-center px-6 space-x-8 shrink-0">
+    <nav className="h-14 w-full bg-gray-800 border-b border-gray-700 flex items-center px-4 md:px-6 space-x-4 md:space-x-8 shrink-0 overflow-hidden">
       <Link 
         to="/" 
-        className="text-xl font-bold text-blue-400 mr-4 hover:text-blue-300 transition-colors cursor-pointer shrink-0"
+        className="text-lg md:text-xl font-bold text-blue-400 mr-2 md:mr-4 hover:text-blue-300 transition-colors cursor-pointer shrink-0"
       >
-        Signals &amp; Systems Visualizer
+        <span className="hidden sm:inline">Signals &amp; Systems Visualizer</span>
+        <span className="sm:hidden">SSV</span>
       </Link>
-      <div className="flex space-x-6 overflow-x-auto no-scrollbar">
+      
+      <div className="flex space-x-4 md:space-x-6 overflow-x-auto no-scrollbar py-2 scroll-smooth">
         {chapters.map((ch) => (
           <NavLink
             key={ch.path}
             to={ch.path}
             className={({ isActive }) =>
-              `text-sm font-medium transition-colors hover:text-white shrink-0 ${
+              `text-xs md:text-sm font-medium transition-colors hover:text-white shrink-0 whitespace-nowrap py-1 ${
                 isActive ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-400'
               }`
             }

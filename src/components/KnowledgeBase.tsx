@@ -32,7 +32,7 @@ const KnowledgeBase: React.FC<KnowledgeBaseProps> = ({ content }) => {
 
   return (
     <div 
-      className="h-full w-full overflow-y-auto p-8 text-gray-100 prose prose-invert prose-lg max-w-none box-border"
+      className="h-full w-full overflow-y-auto p-4 md:p-8 text-gray-100 prose prose-invert prose-sm md:prose-lg max-w-none box-border scroll-smooth"
       onClick={handleClick}
     >
       <ReactMarkdown 

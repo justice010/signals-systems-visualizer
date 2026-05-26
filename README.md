@@ -39,8 +39,8 @@
 1. 克隆仓库到本地：
 
 ```bash
-git clone [https://github.com/your-username/SignalsSystemsVisualizer.git](https://github.com/your-username/SignalsSystemsVisualizer.git)
-cd SignalsSystemsVisualizer
+git clone https://github.com/justice010/signals-systems-visualizer.git
+cd signals-systems-visualizer
 ```
 
 2. 安装依赖

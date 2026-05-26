@@ -1,27 +1,27 @@
-export type ModuleId = 1 | 2 | 3 | 4 | 5 | 'timeDomain';
+export type ModuleId = 1 | 2 | 3 | 4 | 5 | 'timeDomain' | 'sDomain' | 'zDomain' | 'stateSpace';
 
 export type SignalType = 'rect' | 'step' | 'sine' | 'tri';
 export type SystemType = 'exp' | 'rect' | 'step';
 
 export interface ModuleParams {
-  mod1: { N: number };      // 谐波次数
-  mod2: { T: number };      // 周期大小
-  mod3: { a: number };      // 脉冲宽度尺度
-  mod4: { Wc: number };     // 滤波器截止频率
-  mod5: { fs: number };     // 抽样频率
+  mod1: { N: number };
+  mod2: { T: number };
+  mod3: { a: number };
+  mod4: { Wc: number };
+  mod5: { fs: number };
   timeDomain: {
     signalType: SignalType;
     systemType: SystemType;
-    t: number;              // 卷积时间进度
-    autoPlay: boolean;      // 是否自动播放
+    t: number;
+    autoPlay: boolean;
   };
   sDomain: {
-    sigma: number;          // 极点实部
-    omega: number;          // 极点虚部
+    sigma: number;
+    omega: number;
   };
   zDomain: {
-    poleRadius: number;     // 极点半径 r
-    poleAngle: number;      // 极点角度 theta (弧度)
+    poleRadius: number;
+    poleAngle: number;
   };
   stateSpace: {
     dynamicsType: 'stable_focus' | 'center' | 'saddle' | 'unstable_node';

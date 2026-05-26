@@ -13,7 +13,10 @@ const Visualizer: React.FC = () => {
   
   // Controls logic
   const renderControls = () => {
-    if (chapterId === 'state-space') {
+    // Safety check for params
+    if (!params) return null;
+
+    if (chapterId === 'state-space' && params.stateSpace) {
       return (
         <div className="flex flex-wrap items-center gap-6 p-4 bg-gray-800 rounded-lg w-full max-w-5xl">
           <div className="flex items-center space-x-3">
@@ -22,7 +25,7 @@ const Visualizer: React.FC = () => {
               {(['stable_focus', 'center', 'saddle', 'unstable_node'] as const).map((type) => (
                 <button
                   key={type}
-                  onClick={() => updateParam('stateSpace' as any, 'dynamicsType', type as any)}
+                  onClick={() => updateParam('stateSpace', 'dynamicsType', type)}
                   className={`px-3 py-1 text-xs rounded transition-all ${
                     params.stateSpace.dynamicsType === type 
                       ? 'bg-blue-600 text-white shadow-lg' 
@@ -41,7 +44,7 @@ const Visualizer: React.FC = () => {
       );
     }
 
-    if (chapterId === 'z-domain') {
+    if (chapterId === 'z-domain' && params.zDomain) {
       return (
         <div className="flex flex-wrap items-center gap-6 p-4 bg-gray-800 rounded-lg w-full max-w-5xl">
           {/* Radius Control */}
@@ -50,7 +53,7 @@ const Visualizer: React.FC = () => {
             <input 
               type="range" min="0.1" max="1.5" step="0.01" 
               value={params.zDomain.poleRadius}
-              onChange={(e) => updateParam('zDomain' as any, 'poleRadius', parseFloat(e.target.value))}
+              onChange={(e) => updateParam('zDomain', 'poleRadius', parseFloat(e.target.value))}
               className="flex-grow cursor-pointer accent-blue-500"
             />
             <span className={`text-sm font-mono w-12 text-right ${params.zDomain.poleRadius > 1 ? 'text-red-400 font-bold' : 'text-blue-400'}`}>
@@ -64,7 +67,7 @@ const Visualizer: React.FC = () => {
             <input 
               type="range" min="0" max={Math.PI} step="0.05" 
               value={params.zDomain.poleAngle}
-              onChange={(e) => updateParam('zDomain' as any, 'poleAngle', parseFloat(e.target.value))}
+              onChange={(e) => updateParam('zDomain', 'poleAngle', parseFloat(e.target.value))}
               className="flex-grow cursor-pointer accent-purple-500"
             />
             <span className="text-sm font-mono text-purple-400 w-12 text-right">{params.zDomain.poleAngle.toFixed(2)}</span>
@@ -77,7 +80,7 @@ const Visualizer: React.FC = () => {
       );
     }
 
-    if (chapterId === 's-domain') {
+    if (chapterId === 's-domain' && params.sDomain) {
       return (
         <div className="flex flex-wrap items-center gap-6 p-4 bg-gray-800 rounded-lg w-full max-w-5xl">
           {/* Sigma Control */}
@@ -86,7 +89,7 @@ const Visualizer: React.FC = () => {
             <input 
               type="range" min="-5" max="2" step="0.05" 
               value={params.sDomain.sigma}
-              onChange={(e) => updateParam('sDomain' as any, 'sigma', parseFloat(e.target.value))}
+              onChange={(e) => updateParam('sDomain', 'sigma', parseFloat(e.target.value))}
               className="flex-grow cursor-pointer accent-blue-500"
             />
             <span className={`text-sm font-mono w-12 text-right ${params.sDomain.sigma > 0 ? 'text-red-400 font-bold' : 'text-blue-400'}`}>
@@ -100,7 +103,7 @@ const Visualizer: React.FC = () => {
             <input 
               type="range" min="0" max="10" step="0.1" 
               value={params.sDomain.omega}
-              onChange={(e) => updateParam('sDomain' as any, 'omega', parseFloat(e.target.value))}
+              onChange={(e) => updateParam('sDomain', 'omega', parseFloat(e.target.value))}
               className="flex-grow cursor-pointer accent-purple-500"
             />
             <span className="text-sm font-mono text-purple-400 w-12 text-right">{params.sDomain.omega.toFixed(1)}</span>
@@ -113,7 +116,7 @@ const Visualizer: React.FC = () => {
       );
     }
 
-    if (chapterId === 'time-domain') {
+    if (chapterId === 'time-domain' && params.timeDomain) {
       return (
         <div className="flex flex-wrap items-center gap-6 p-4 bg-gray-800 rounded-lg w-full max-w-5xl">
           {/* Signal x(t) Select */}
@@ -121,7 +124,7 @@ const Visualizer: React.FC = () => {
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Signal x(\u03C4):</label>
             <select 
               value={params.timeDomain.signalType}
-              onChange={(e) => updateParam('timeDomain' as any, 'signalType', e.target.value as any)}
+              onChange={(e) => updateParam('timeDomain', 'signalType', e.target.value)}
               className="bg-gray-700 text-blue-400 text-sm rounded px-2 py-1 outline-none border border-gray-600 focus:border-blue-500"
             >
               <option value="rect">Rect Pulse</option>
@@ -136,7 +139,7 @@ const Visualizer: React.FC = () => {
             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">System h(\u03C4):</label>
             <select 
               value={params.timeDomain.systemType}
-              onChange={(e) => updateParam('timeDomain' as any, 'systemType', e.target.value as any)}
+              onChange={(e) => updateParam('timeDomain', 'systemType', e.target.value)}
               className="bg-gray-700 text-green-400 text-sm rounded px-2 py-1 outline-none border border-gray-600 focus:border-green-500"
             >
               <option value="exp">Exp Decay</option>
@@ -174,17 +177,22 @@ const Visualizer: React.FC = () => {
 
     if (chapterId !== 'fourier') return <div className="text-gray-500 italic">本章节暂无参数调节</div>;
 
+    const modKey = (typeof activeModule === 'number' && activeModule <= 5 ? `mod${activeModule}` : activeModule) as keyof typeof params;
+    const modParams = params[modKey] as any;
+
+    if (!modParams) return null;
+
     switch (activeModule) {
       case 1:
         return (
           <div className="flex items-center space-x-4 p-4 bg-gray-800 rounded-lg w-full max-w-2xl">
             <label className="text-sm font-semibold text-gray-200 shrink-0">谐波次数 N:</label>
             <input 
-              type="range" min="1" max="50" step="2" value={params.mod1.N}
+              type="range" min="1" max="50" step="2" value={modParams.N}
               onChange={(e) => updateParam(1, 'N', parseFloat(e.target.value))}
               className="flex-grow cursor-pointer"
             />
-            <span className="text-sm font-mono text-blue-400 w-8">{params.mod1.N}</span>
+            <span className="text-sm font-mono text-blue-400 w-8">{modParams.N}</span>
           </div>
         );
       case 2:
@@ -192,11 +200,11 @@ const Visualizer: React.FC = () => {
           <div className="flex items-center space-x-4 p-4 bg-gray-800 rounded-lg w-full max-w-2xl">
             <label className="text-sm font-semibold text-gray-200 shrink-0">周期 T:</label>
             <input 
-              type="range" min="2" max="20" step="0.5" value={params.mod2.T}
+              type="range" min="2" max="20" step="0.5" value={modParams.T}
               onChange={(e) => updateParam(2, 'T', parseFloat(e.target.value))}
               className="flex-grow cursor-pointer"
             />
-            <span className="text-sm font-mono text-purple-400 w-8">{params.mod2.T}</span>
+            <span className="text-sm font-mono text-purple-400 w-8">{modParams.T}</span>
           </div>
         );
       case 3:
@@ -204,11 +212,11 @@ const Visualizer: React.FC = () => {
           <div className="flex items-center space-x-4 p-4 bg-gray-800 rounded-lg w-full max-w-2xl">
             <label className="text-sm font-semibold text-gray-200 shrink-0">脉冲宽度尺度 a:</label>
             <input 
-              type="range" min="0.2" max="5" step="0.1" value={params.mod3.a}
+              type="range" min="0.2" max="5" step="0.1" value={modParams.a}
               onChange={(e) => updateParam(3, 'a', parseFloat(e.target.value))}
               className="flex-grow cursor-pointer"
             />
-            <span className="text-sm font-mono text-green-400 w-8">{params.mod3.a.toFixed(1)}</span>
+            <span className="text-sm font-mono text-green-400 w-8">{modParams.a?.toFixed(1)}</span>
           </div>
         );
       case 4:
@@ -216,11 +224,11 @@ const Visualizer: React.FC = () => {
           <div className="flex items-center space-x-4 p-4 bg-gray-800 rounded-lg w-full max-w-2xl">
             <label className="text-sm font-semibold text-gray-200 shrink-0">截止频率 Wc:</label>
             <input 
-              type="range" min="1" max="20" step="1" value={params.mod4.Wc}
+              type="range" min="1" max="20" step="1" value={modParams.Wc}
               onChange={(e) => updateParam(4, 'Wc', parseFloat(e.target.value))}
               className="flex-grow cursor-pointer"
             />
-            <span className="text-sm font-mono text-blue-400 w-8">{params.mod4.Wc}</span>
+            <span className="text-sm font-mono text-blue-400 w-8">{modParams.Wc}</span>
           </div>
         );
       case 5:
@@ -228,11 +236,11 @@ const Visualizer: React.FC = () => {
           <div className="flex items-center space-x-4 p-4 bg-gray-800 rounded-lg w-full max-w-2xl">
             <label className="text-sm font-semibold text-gray-200 shrink-0">抽样频率 fs:</label>
             <input 
-              type="range" min="0.5" max="5.0" step="0.1" value={params.mod5.fs}
+              type="range" min="0.5" max="5.0" step="0.1" value={modParams.fs}
               onChange={(e) => updateParam(5, 'fs', parseFloat(e.target.value))}
               className="flex-grow cursor-pointer"
             />
-            <span className="text-sm font-mono text-red-400 w-8">{params.mod5.fs.toFixed(1)}</span>
+            <span className="text-sm font-mono text-red-400 w-8">{modParams.fs?.toFixed(1)}</span>
           </div>
         );
       default:
@@ -258,8 +266,12 @@ const Visualizer: React.FC = () => {
       ctx.fillStyle = '#1a1a2e';
       ctx.fillRect(0, 0, width, height);
 
-      if (strategy) {
-        strategy.render(ctx, width, height, t, activeModule, params);
+      if (strategy && params) {
+        try {
+          strategy.render(ctx, width, height, t, activeModule, params);
+        } catch (err) {
+          console.error('Render error:', err);
+        }
       } else {
         ctx.fillStyle = '#444';
         ctx.font = '20px sans-serif';
@@ -289,7 +301,8 @@ const Visualizer: React.FC = () => {
   }, [chapterId, activeModule, params]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-gray-900 overflow-hidden">
+    <div className="flex flex-col h-full w-full bg-gray-900 overflow-hidden relative">
+      <div className="absolute top-2 right-2 text-[10px] text-gray-700 pointer-events-none">v1.2-fix</div>
       <div className="h-20 border-b border-gray-700 p-2 flex justify-center items-center shrink-0">
         {renderControls()}
       </div>

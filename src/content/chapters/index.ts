@@ -121,25 +121,30 @@ z 域分析是数字信号处理 (DSP) 的基石。它通过 $z$ 变换将离散
 <br>
 <button class="not-prose interactive-btn bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="zDomain" data-params='{"poleRadius": 1.1, "poleAngle": 0.4}'>▶ 演示：不稳定系统 (序列爆炸)</button>
 `,
-  'state-space': `# 状态空间分析：几何空间中的动力学
+  'state-space': `# 状态空间分析：几何视角下的系统动力学
 
-状态空间表示法是现代控制理论的核心。它不再关注输入与输出的单一映射，而是深入系统内部，观察多个内部**状态变量**如何随时间共同演化。
+状态空间分析是现代控制理论的核心。它不再仅仅关注单一的输入输出关系，而是将系统看作一个在多维空间中演化的状态向量 $x(t)$。
 
-### 核心方程：线性动力系统
-对于一个二阶系统，其演化规律由矩阵 $A$ 决定：
+### 状态方程
+对于一个线性二阶齐次系统，其演化遵循：
 $$\\begin{bmatrix} x'_1 \\\\ x'_2 \\end{bmatrix} = A \\begin{bmatrix} x_1 \\\\ x_2 \\end{bmatrix}$$
 
-系统的命运完全由矩阵 $A$ 的**特征值**主宰：
-- **特征值为负实部复数:** 轨迹呈螺旋线向原点坍缩（稳定）。
-- **特征值为纯虚数:** 轨迹形成闭合椭圆（等幅振荡）。
-- **特征值一正一负:** 轨迹呈现“鞍点”形状，从一个方向吸入，从另一个方向弹射（不稳定）。
+系统的命运（轨迹的几何形状）完全取决于矩阵 $A$ 的**特征值 (Eigenvalues)**。
 
-右侧展示了**相平面 (Phase Portrait)** 与时域波形的实时联动。
+### 特征值与相轨迹
+- **稳定焦点 (Stable Focus):** 特征值为复数且实部为负。轨迹像漩涡一样**向内螺旋**，最终坍缩至原点。
+- **中心点 (Center):** 特征值为纯虚数。轨迹形成完美的**闭合环路**，对应无损耗的简谐振荡。
+- **鞍点 (Saddle):** 一个特征值为正，一个为负。轨迹在一个方向吸引，另一个方向排斥，形成**双曲线发散**。
+- **不稳定节点 (Unstable Node):** 特征值均为正实数。轨迹从原点猛烈**向外抛射**。
 
-<button class="not-prose interactive-btn bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mt-2 mb-4 transition-colors cursor-pointer" data-module="stateSpace" data-params='{"dynamicsType": "stable_focus"}'>▶ 演示：稳定焦点 (向内螺旋)</button>
+右侧的可视化展示了相平面（左图）与状态变量时间序列（右图）的实时联动。
+
+<button class="not-prose interactive-btn bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded mt-2 mb-4 transition-colors cursor-pointer" data-module="stateSpace" data-params='{"dynamicsType": "stable_focus"}'>▶ 演示：稳定焦点 (螺旋坍缩)</button>
 <br>
-<button class="not-prose interactive-btn bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="stateSpace" data-params='{"dynamicsType": "center"}'>▶ 演示：中心点 (闭合轨道)</button>
+<button class="not-prose interactive-btn bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="stateSpace" data-params='{"dynamicsType": "center"}'>▶ 演示：中心点 (永恒简谐振荡)</button>
 <br>
-<button class="not-prose interactive-btn bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="stateSpace" data-params='{"dynamicsType": "saddle"}'>▶ 演示：鞍点 (双曲线发散)</button>
+<button class="not-prose interactive-btn bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="stateSpace" data-params='{"dynamicsType": "saddle"}'>▶ 演示：鞍点 (双曲线发散)</button>
+<br>
+<button class="not-prose interactive-btn bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded mb-4 transition-colors cursor-pointer" data-module="stateSpace" data-params='{"dynamicsType": "unstable_node"}'>▶ 演示：不稳定节点 (猛烈爆炸)</button>
 `,
 };

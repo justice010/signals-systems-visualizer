@@ -6,7 +6,7 @@ interface AppState {
   params: ModuleParams;
   // Actions
   setActiveModule: (id: ModuleId) => void;
-  updateParam: (moduleId: ModuleId, paramName: string, value: number) => void;
+  updateParam: (moduleId: ModuleId, paramName: string, value: any) => void;
   syncParams: (moduleId: ModuleId, newParams: any) => void;
 }
 
@@ -38,13 +38,13 @@ export const useAppStore = create<AppState>((set) => ({
   },
   setActiveModule: (id) => set({ activeModule: id }),
   updateParam: (moduleId, paramName, value) => set((state) => {
-    // Handle both indexed modules (1-5) and named modules like 'timeDomain'
     const moduleKey = typeof moduleId === 'number' ? `mod${moduleId}` : moduleId;
+    const currentParams = state.params as any;
     return {
       params: {
         ...state.params,
         [moduleKey]: {
-          ...(state.params as any)[moduleKey],
+          ...currentParams[moduleKey],
           [paramName]: value
         }
       }
@@ -52,12 +52,13 @@ export const useAppStore = create<AppState>((set) => ({
   }),
   syncParams: (moduleId, newParams) => set((state) => {
     const moduleKey = typeof moduleId === 'number' ? `mod${moduleId}` : moduleId;
+    const currentParams = state.params as any;
     return {
       activeModule: typeof moduleId === 'number' ? moduleId : state.activeModule,
       params: {
         ...state.params,
         [moduleKey]: {
-          ...(state.params as any)[moduleKey],
+          ...currentParams[moduleKey],
           ...newParams
         }
       }

@@ -12,174 +12,154 @@ export class StateSpaceStrategy implements CanvasStrategy {
     params: ModuleParams
   ): void {
     const { dynamicsType } = params.stateSpace;
-
-    // Define Matrix A for x' = Ax
-    let a11 = 0, a12 = 0, a21 = 0, a22 = 0;
-    let isUnstable = false;
-
-    switch (dynamicsType) {
-      case 'stable_focus':
-        a11 = -0.2; a12 = -1;
-        a21 = 1;    a22 = -0.2;
-        break;
-      case 'center':
-        a11 = 0; a12 = -1;
-        a21 = 1; a22 = 0;
-        break;
-      case 'saddle':
-        a11 = 1;  a12 = 0;
-        a21 = 0;  a22 = -1;
-        isUnstable = true;
-        break;
-      case 'unstable_node':
-        a11 = 0.5; a12 = 0;
-        a21 = 0;   a22 = 0.8;
-        isUnstable = true;
-        break;
-    }
+    const isUnstable = dynamicsType === 'saddle' || dynamicsType === 'unstable_node';
 
     const halfH = height / 2;
+    
+    // Grid Scaling
+    const spaceScale = 40; // Reduced slightly for vertical layout
+    const timeScaleX = 60; // Increased for wider time view
+    const timeScaleY = 30; // Reduced for vertical compression
+
+    // --- 1. Top View: Phase Portrait (x1 vs x2) ---
+    ctx.save();
+    drawAxes(ctx, 0, width, halfH, "Phase Portrait (x1 vs x2)");
     const originX = width / 2;
-    const phaseOriginY = halfH / 2;
-    const timeOriginY = halfH + halfH / 2;
+    const originY = halfH / 2;
 
-    const scalePhase = 40; // pixels per unit
-    const scaleTimeX = 40; 
-    const scaleTimeY = 30;
-
-    // Numerical integration (Euler) for trajectory
-    const dt = 0.02;
-    const x0 = [2, 2]; // Initial state
-    let currX = x0[0];
-    let currY = x0[1];
-
-    // Current time in the simulation
-    const simTimeLimit = 20;
-    const tCurrent = globalTime % simTimeLimit;
-
-    // Flash background for instability
+    // Background flash for instability
     if (isUnstable) {
-      const pulse = (Math.sin(globalTime * 10) + 1) / 2;
-      ctx.fillStyle = `rgba(239, 68, 68, ${0.03 + pulse * 0.05})`;
+      const pulse = (Math.sin(globalTime * 5) + 1) / 2;
+      ctx.fillStyle = `rgba(239, 68, 68, ${0.02 + pulse * 0.05})`;
       ctx.fillRect(0, 0, width, halfH);
     }
 
-    // --- 1. Phase Portrait (Left/Upper View) ---
-    drawAxes(ctx, 0, width, halfH, "Phase Portrait: x\u2082 vs x\u2081");
+    // Matrix A and initial condition
+    let A = [[-0.2, -1], [1, -0.2]]; // Default focus
+    if (dynamicsType === 'center') A = [[0, -1], [1, 0]];
+    if (dynamicsType === 'saddle') A = [[0.5, 0], [0, -0.5]];
+    if (dynamicsType === 'unstable_node') A = [[0.5, 0.2], [0.1, 0.4]];
 
-    // Draw Vector Field (Optional but pro: tiny arrows)
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-    for (let i = -5; i <= 5; i += 1) {
-      for (let j = -5; j <= 5; j += 1) {
-        const dx = a11 * i + a12 * j;
-        const dy = a21 * i + a22 * j;
+    const x0 = [2, 2];
+    
+    // RK4 Integrator for trajectory
+    const dt = 0.05;
+    const maxT = (globalTime % 15); // Loop every 15 seconds
+    let currentX = [...x0];
+    const trajectory = [[...x0]];
+
+    const f = (x: number[]) => [
+      A[0][0] * x[0] + A[0][1] * x[1],
+      A[1][0] * x[0] + A[1][1] * x[1]
+    ];
+
+    for (let t = 0; t < maxT; t += dt) {
+      const k1 = f(currentX);
+      const k2 = f([currentX[0] + k1[0]*dt/2, currentX[1] + k1[1]*dt/2]);
+      const k3 = f([currentX[0] + k2[0]*dt/2, currentX[1] + k2[1]*dt/2]);
+      const k4 = f([currentX[0] + k3[0]*dt, currentX[1] + k3[1]*dt]);
+      
+      currentX[0] += (dt/6) * (k1[0] + 2*k2[0] + 2*k3[0] + k4[0]);
+      currentX[1] += (dt/6) * (k1[1] + 2*k2[1] + 2*k3[1] + k4[1]);
+      
+      trajectory.push([...currentX]);
+      
+      // Limit explosion for visualization
+      if (Math.abs(currentX[0]) > 30 || Math.abs(currentX[1]) > 30) break;
+    }
+
+    // Draw Flow Field (Arrows)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 1;
+    const gridStep = 1.5;
+    for (let gx = -8; gx <= 8; gx += gridStep) {
+      for (let gy = -5; gy <= 5; gy += gridStep) {
+        const dx = A[0][0] * gx + A[0][1] * gy;
+        const dy = A[1][0] * gx + A[1][1] * gy;
         const mag = Math.sqrt(dx*dx + dy*dy) || 1;
-        const px = originX + i * scalePhase;
-        const py = phaseOriginY - j * scalePhase;
+        
+        const sx = originX + gx * spaceScale;
+        const sy = originY - gy * spaceScale;
         ctx.beginPath();
-        ctx.moveTo(px, py);
-        ctx.lineTo(px + (dx/mag) * 10, py - (dy/mag) * 10);
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(sx + (dx/mag) * 12, sy - (dy/mag) * 12);
         ctx.stroke();
       }
     }
 
-    // Compute and draw trajectory
-    ctx.beginPath();
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 2;
-    
-    let stateX = currX;
-    let stateY = currY;
-    
-    // We compute full trajectory but only show up to tCurrent
-    const steps = Math.floor(tCurrent / dt);
-    const historyX: number[] = [];
-    const historyY: number[] = [];
-
-    for (let s = 0; s <= steps; s++) {
-      historyX.push(stateX);
-      historyY.push(stateY);
-      
-      const px = originX + stateX * scalePhase;
-      const py = phaseOriginY - stateY * scalePhase;
-      
-      if (s === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-
-      // Derivatives
-      const dx = a11 * stateX + a12 * stateY;
-      const dy = a21 * stateX + a22 * stateY;
-      
-      // Update state (Euler)
-      stateX += dx * dt;
-      stateY += dy * dt;
-
-      // Safety: stop if out of bounds
-      if (Math.abs(stateX) > 100 || Math.abs(stateY) > 100) break;
-    }
-    ctx.stroke();
-
-    // Draw energy ball (Current State)
-    const lastX = historyX[historyX.length - 1] || currX;
-    const lastY = historyY[historyY.length - 1] || currY;
-    const ballPX = originX + lastX * scalePhase;
-    const ballPY = phaseOriginY - lastY * scalePhase;
-
-    ctx.beginPath();
-    const gradient = ctx.createRadialGradient(ballPX, ballPY, 0, ballPX, ballPY, 10);
-    gradient.addColorStop(0, '#fff');
-    gradient.addColorStop(0.4, '#38bdf8');
-    gradient.addColorStop(1, 'transparent');
-    ctx.fillStyle = gradient;
-    ctx.arc(ballPX, ballPY, 10, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Axis labels
-    ctx.fillStyle = '#888';
-    ctx.font = 'italic 12px serif';
-    ctx.fillText("x\u2081 (State 1)", width - 60, phaseOriginY - 10);
-    ctx.fillText("x\u2082 (State 2)", originX + 10, 20);
-
-    // --- 2. Time Domain Evolution (Lower View) ---
-    drawAxes(ctx, halfH, width, halfH, "State Evolution: x\u2081(t) [Red] and x\u2082(t) [Blue]");
-
-    // Draw x1(t) - Red
-    ctx.beginPath();
-    ctx.strokeStyle = '#f87171';
-    ctx.lineWidth = 2;
-    for (let i = 0; i < historyX.length; i++) {
-        const px = originX + (i * dt) * scaleTimeX;
-        const py = timeOriginY - historyX[i] * scaleTimeY;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-    }
-    ctx.stroke();
-
-    // Draw x2(t) - Blue
+    // Draw Trajectory
     ctx.beginPath();
     ctx.strokeStyle = '#60a5fa';
-    ctx.lineWidth = 2;
-    for (let i = 0; i < historyY.length; i++) {
-        const px = originX + (i * dt) * scaleTimeX;
-        const py = timeOriginY - historyY[i] * scaleTimeY;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-    }
+    ctx.lineWidth = 2.5;
+    trajectory.forEach((p, i) => {
+      const px = originX + p[0] * spaceScale;
+      const py = originY - p[1] * spaceScale;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
     ctx.stroke();
 
-    // Labels and Status
-    ctx.font = 'bold 16px sans-serif';
-    ctx.textAlign = 'right';
-    if (isUnstable) {
-        ctx.fillStyle = '#f87171';
-        ctx.fillText("UNSTABLE DYNAMICS", width - 20, height - 60);
-    } else {
-        ctx.fillStyle = '#34d399';
-        ctx.fillText("STABLE CONVERGENCE", width - 20, height - 60);
-    }
+    // Draw Energy Ball (Current State)
+    const lastP = trajectory[trajectory.length - 1];
+    const ballX = originX + lastP[0] * spaceScale;
+    const ballY = originY - lastP[1] * spaceScale;
     
+    const gradient = ctx.createRadialGradient(ballX, ballY, 0, ballX, ballY, 12);
+    gradient.addColorStop(0, '#fff');
+    gradient.addColorStop(0.4, '#60a5fa');
+    gradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(ballX, ballY, 12, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Type Label (Top Right)
+    ctx.textAlign = 'right';
+    ctx.font = 'bold 18px sans-serif';
+    ctx.fillStyle = isUnstable ? '#f87171' : '#34d399';
+    ctx.fillText(dynamicsType.replace('_', ' ').toUpperCase(), width - 20, 35);
+
+    ctx.restore();
+
+    // --- 2. Bottom View: Time Domain (x1(t), x2(t)) ---
+    ctx.save();
+    ctx.translate(0, halfH);
+    drawAxes(ctx, 0, width, halfH, "Time Domain Evolution (x1, x2 vs t)");
+    const tOriginY = halfH / 2;
+    const tOriginX = width / 2; // Keep time centered for aesthetic
+
+    // x1(t) - Red
+    ctx.beginPath();
+    ctx.strokeStyle = '#f43f5e';
+    ctx.lineWidth = 2;
+    trajectory.forEach((p, i) => {
+      const px = (tOriginX - (maxT * timeScaleX / 2)) + i * dt * timeScaleX;
+      const py = tOriginY - p[0] * timeScaleY;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+    
+    // x2(t) - Blue
+    ctx.beginPath();
+    ctx.strokeStyle = '#3b82f6';
+    ctx.lineWidth = 2;
+    trajectory.forEach((p, i) => {
+      const px = (tOriginX - (maxT * timeScaleX / 2)) + i * dt * timeScaleX;
+      const py = tOriginY - p[1] * timeScaleY;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+
+    // Legend - Moved to bottom right to avoid overlap with title
+    ctx.textAlign = 'right';
     ctx.font = '12px monospace';
-    ctx.fillStyle = '#888';
-    ctx.fillText(`Matrix A = [[${a11}, ${a12}], [${a21}, ${a22}]]`, width - 20, height - 30);
+    ctx.fillStyle = '#f43f5e';
+    ctx.fillText("x1(t)", width - 20, halfH - 40);
+    ctx.fillStyle = '#3b82f6';
+    ctx.fillText("x2(t)", width - 20, halfH - 20);
+
+    ctx.restore();
   }
 }

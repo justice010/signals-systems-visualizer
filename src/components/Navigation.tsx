@@ -1,0 +1,35 @@
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+
+const chapters = [
+  { path: '/chapter/time-domain', label: '时域分析' },
+  { path: '/chapter/fourier', label: '傅里叶变换' },
+  { path: '/chapter/s-domain', label: 's 域分析 (Laplace)' },
+  { path: '/chapter/z-domain', label: 'z 域分析' },
+  { path: '/chapter/state-space', label: '状态空间' },
+];
+
+const Navigation: React.FC = () => {
+  return (
+    <nav className="h-14 w-full bg-gray-800 border-b border-gray-700 flex items-center px-6 space-x-8 shrink-0">
+      <div className="text-xl font-bold text-blue-400 mr-4">FourierViz Pro</div>
+      <div className="flex space-x-6">
+        {chapters.map((ch) => (
+          <NavLink
+            key={ch.path}
+            to={ch.path}
+            className={({ isActive }) =>
+              `text-sm font-medium transition-colors hover:text-white ${
+                isActive ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-400'
+              }`
+            }
+          >
+            {ch.label}
+          </NavLink>
+        ))}
+      </div>
+    </nav>
+  );
+};
+
+export default Navigation;

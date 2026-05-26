@@ -3,6 +3,8 @@ import AppLayout from '../components/AppLayout';
 import ChapterView from '../components/ChapterView';
 import ErrorPage from '../components/ErrorPage';
 import HomePage from '../components/HomePage';
+import KnowledgeHome from '../components/KnowledgeHome';
+import KnowledgeChapter from '../components/KnowledgeChapter';
 
 const router = createBrowserRouter([
   {
@@ -17,6 +19,14 @@ const router = createBrowserRouter([
       {
         path: 'chapter/:chapterId',
         element: <ChapterView />,
+      },
+      {
+        path: 'knowledge',
+        element: <KnowledgeHome />,
+      },
+      {
+        path: 'knowledge/:chapterId',
+        element: <KnowledgeChapter />,
       },
       {
         path: '*',

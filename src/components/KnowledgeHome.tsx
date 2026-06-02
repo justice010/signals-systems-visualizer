@@ -67,13 +67,13 @@ const KnowledgeHome: React.FC = () => {
             理论知识库
           </h1>
         </div>
-        {/* <p className="text-lg text-gray-400 font-medium border-l-4 border-blue-500 pl-4 max-w-2xl">
+        <p className="text-lg text-gray-400 font-medium border-l-4 border-blue-500 pl-4 max-w-2xl">
           动态知识库已就绪。系统会自动扫描{" "}
           <code className="bg-gray-800 px-2 py-1 rounded text-blue-400 text-sm">
             src/content/knowledge/
           </code>{" "}
           下的所有 Markdown 文件并实时更新目录。
-        </p> */}
+        </p>
       </header>
 
       {loading ? (

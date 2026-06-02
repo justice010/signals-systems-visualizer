@@ -16,14 +16,16 @@ const KnowledgeChapter: React.FC = () => {
   useEffect(() => {
     const loadContent = async () => {
       setLoading(true);
-      // Try to find the exact match or fuzzy match (case/path style)
       const availableKeys = Object.keys(knowledgeModules);
       const matchingKey = availableKeys.find(key => key.endsWith(`${chapterId}.md`));
 
       if (matchingKey) {
         try {
-          const raw = await knowledgeModules[matchingKey]();
-          setContent(raw as string);
+          const raw = await knowledgeModules[matchingKey]() as string;
+          
+          // --- Robustly Strip YAML Frontmatter (Supporting \r\n) ---
+          const body = raw.replace(/^---[\s\S]*?\r?\n---\r?\n?/, '').trim();
+          setContent(body);
         } catch (err) {
           console.error('Error loading knowledge content:', err);
           setContent('# 加载失败\n\n读取文档内容时出错。');
@@ -49,14 +51,14 @@ const KnowledgeChapter: React.FC = () => {
             <svg className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span className="font-bold">返回知识库目录</span>
+            <span className="font-bold text-sm md:text-base">返回知识库目录</span>
           </Link>
           
           <Link 
             to={`/chapter/${chapterId}`} 
-            className="text-xs bg-blue-600/20 text-blue-400 border border-blue-500/30 px-4 py-2 rounded-full hover:bg-blue-600 hover:text-white transition-all"
+            className="text-[10px] md:text-xs bg-blue-600/20 text-blue-400 border border-blue-500/30 px-3 py-1.5 md:px-4 md:py-2 rounded-full hover:bg-blue-600 hover:text-white transition-all"
           >
-            跳转到交互实验 ▶
+            进入仿真实验室 ▶
           </Link>
         </nav>
 
@@ -65,7 +67,7 @@ const KnowledgeChapter: React.FC = () => {
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
           </div>
         ) : (
-          <article className="prose prose-invert prose-lg max-w-none prose-headings:tracking-tight prose-a:text-blue-400 prose-img:rounded-xl">
+          <article className="prose prose-invert prose-sm md:prose-lg max-w-none prose-headings:tracking-tight prose-a:text-blue-400 prose-img:rounded-xl">
             <ReactMarkdown 
               remarkPlugins={[remarkMath]}
               rehypePlugins={[rehypeKatex, rehypeRaw]}
@@ -75,7 +77,7 @@ const KnowledgeChapter: React.FC = () => {
           </article>
         )}
 
-        <footer className="mt-20 pt-8 border-t border-gray-800 text-center text-gray-600 text-sm pb-12">
+        <footer className="mt-20 pt-8 border-t border-gray-800 text-center text-gray-600 text-xs md:text-sm pb-12">
           Signals & Systems Visualizer - 理论精讲系列
         </footer>
       </div>

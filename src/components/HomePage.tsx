@@ -99,24 +99,14 @@ const HomePage: React.FC = () => {
           <p className="text-gray-400 text-sm md:text-base mb-4">
             ☕ 如果觉得有帮助，可以请作者喝杯奶茶
           </p>
-          <div className="flex gap-6 md:gap-8 justify-center items-end">
-            <div className="flex flex-col items-center gap-2">
-              <img
-                src="/signals-systems-visualizer/wechat-pay.png"
-                alt="微信收款码"
-                className="w-32 h-32 md:w-40 md:h-40 rounded-xl"
-              />
-              <span className="text-gray-500 text-xs md:text-sm">微信</span>
-            </div>
-            <div className="flex flex-col items-center gap-2">
-              <img
-                src="/signals-systems-visualizer/alipay.png"
-                alt="支付宝收款码"
-                className="w-32 h-32 md:w-40 md:h-40 rounded-xl"
-              />
-              <span className="text-gray-500 text-xs md:text-sm">支付宝</span>
-            </div>
-          </div>
+          <a
+            href="https://afdian.com/a/justice010"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 hover:border-blue-400 text-blue-400 hover:text-blue-300 rounded-xl transition-all duration-300 text-sm md:text-base font-medium"
+          >
+            ❤️ 在爱发电支持我
+          </a>
         </div>
         <p className="text-gray-500 text-[10px] md:text-sm tracking-widest px-4">
           探索频域与时域的奥秘，让抽象的数学在几何流动中具象化。
